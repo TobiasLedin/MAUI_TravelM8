@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:MAUI_TravelM8"
+             x:Class="MAUI_TravelM8.Views.FlightSearch"
+             x:DataType="viewmodel:FlightSearchViewModel">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="0,0"
+            Spacing="25">
+
+            <Label
+                Text="TravelM8"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" />
+
+            <Label
+                Text="Keep track of your next flights"
+                Style="{StaticResource SubHeadline}"
+                SemanticProperties.HeadingLevel="Level2"
+                SemanticProperties.Description="Keep track of your next flights" />
+
+            <Label
+                Text="Flight number"
+                Style="{StaticResource Notice}"
+                SemanticProperties.Description="Flight number" />
+
+            <Entry
+                x:Name="entry"
+                MaximumWidthRequest="200"
+                Placeholder="SK903..."
+                MaxLength="12"
+                ClearButtonVisibility="WhileEditing"
+                TextTransform="Uppercase"
+                Keyboard="Text"
+                IsSpellCheckEnabled="False"
+                ReturnType="Search"
+                Text="{Binding FlightNumberInput, Mode=TwoWay}" />
+
+            <Picker
+                x:Name="AirportPicker"
+                WidthRequest="200"
+                ItemsSource="{Binding Airports}"
+                SelectedItem="{Binding SelectedAirport}" />
+
+            <DatePicker
+                Date="{Binding SelectedDate}"
+                MinimumDate="{Binding MinAllowedDate}"
+                HorizontalOptions="CenterAndExpand"
+                MaximumWidthRequest="200" />
+
+            <Button
+                x:Name="SearchBtn"
+                Text="Search"
+                MaximumWidthRequest="150"
+                SemanticProperties.Hint="Find your flight"
+                HorizontalOptions="Fill"
+                Command="{Binding SearchFlightsCommand}"/>
+
+            <Label
+                Text="Currently only has support for swedish airports"
+                Style="{StaticResource Notice}"
+                SemanticProperties.Description="Currently only has support for swedish airports" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

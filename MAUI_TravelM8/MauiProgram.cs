@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MAUI_TravelM8.Services;
+using MAUI_TravelM8.ViewModels;
+using MAUI_TravelM8.Views;
+using Microsoft.Extensions.Logging;
 
 namespace MAUI_TravelM8
 {
@@ -27,6 +30,11 @@ namespace MAUI_TravelM8
                     fonts.AddFont("Roboto-Thin.ttf", "RobotoThin");
                     fonts.AddFont("Roboto-ThinItalic.ttf", "RobotoThinItalic");
                 });
+
+            builder.Services.AddSingleton<ITravelDataService, TravelDataService>();
+            builder.Services.AddSingleton<FlightSearchViewModel>();
+
+            Routing.RegisterRoute(nameof(FlightList), typeof(FlightList));
 
 #if DEBUG
     		builder.Logging.AddDebug();
