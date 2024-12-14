@@ -6,7 +6,8 @@ namespace MAUI_TravelM8.Services
     public interface ITravelDataService
     {
         Task<ActionResult<List<Airport>>> GetAirportData();
-        Task<ActionResult<List<Flight>>> GetAirportDepartures(Airport airport, DateTime date);
+        Task<ActionResult<DepartureData>> GetAirportDepartures(Airport airport, DateTime date);
+        Task<ActionResult<DepartureData>> ReadStoredDepartureData();
 
     }
 }

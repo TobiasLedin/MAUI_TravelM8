@@ -21,15 +21,10 @@
                 SemanticProperties.HeadingLevel="Level2"
                 SemanticProperties.Description="Keep track of your next flights" />
 
-            <Label
-                Text="Flight number"
-                Style="{StaticResource Notice}"
-                SemanticProperties.Description="Flight number" />
-
             <Entry
                 x:Name="entry"
-                MaximumWidthRequest="200"
-                Placeholder="SK903..."
+                MaximumWidthRequest="160"
+                Placeholder="Flight number..."
                 MaxLength="12"
                 ClearButtonVisibility="WhileEditing"
                 TextTransform="Uppercase"
@@ -40,7 +35,7 @@
 
             <Picker
                 x:Name="AirportPicker"
-                WidthRequest="200"
+                WidthRequest="160"
                 ItemsSource="{Binding Airports}"
                 SelectedItem="{Binding SelectedAirport}" />
 
@@ -48,12 +43,12 @@
                 Date="{Binding SelectedDate}"
                 MinimumDate="{Binding MinAllowedDate}"
                 HorizontalOptions="CenterAndExpand"
-                MaximumWidthRequest="200" />
+                MinimumWidthRequest="160" />
 
             <Button
                 x:Name="SearchBtn"
                 Text="Search"
-                MaximumWidthRequest="150"
+                MaximumWidthRequest="160"
                 SemanticProperties.Hint="Find your flight"
                 HorizontalOptions="Fill"
                 Command="{Binding SearchFlightsCommand}"/>

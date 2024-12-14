@@ -32,12 +32,13 @@ namespace MAUI_TravelM8
                 });
 
             builder.Services.AddSingleton<ITravelDataService, TravelDataService>();
-            builder.Services.AddSingleton<FlightSearchViewModel>();
 
-            Routing.RegisterRoute(nameof(FlightList), typeof(FlightList));
+            builder.Services.AddSingleton<FlightSearchViewModel>();
+            builder.Services.AddSingleton<FlightListViewModel>();
+
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

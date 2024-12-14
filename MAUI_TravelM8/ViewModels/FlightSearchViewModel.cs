@@ -101,21 +101,19 @@ namespace MAUI_TravelM8
             {
                 var result = await _dataService.GetAirportDepartures(SelectedAirport, SelectedDate);
 
-                if (result.Success && result.Data != null && result.Data.Count > 0)
+                if (result.Success && result.Data != null && result.Data.Flights?.Length > 0)
                 {
-                    var flightListViewModel = new FlightListViewModel()
+                    var navigationParam = new Dictionary<string, object>
                     {
-                        Flights = new ObservableCollection<Flight>(result.Data.OrderBy(x => x.DepartureTime?.ScheduledUtc)),
-                        DepartureAirport = SelectedAirport.DisplayName!
+                        ["Flights"] = new ObservableCollection<Flight>(result.Data.Flights.OrderBy(x => x.DepartureTime?.ScheduledUtc)),
+                        ["DepartureAirport"] = SelectedAirport.DisplayName!,
+                        ["DepartureDate"] = result.Data.From?.FlightDepartureDate!
                     };
 
-                    await Shell.Current.GoToAsync(nameof(FlightList),
-                        new Dictionary<string, object>()
-                        {
-                            ["FlightListViewModel"] = flightListViewModel
-                        });
+                    await Shell.Current.GoToAsync(nameof(FlightList), navigationParam);
+                       
                 }
-                else if (result.Success && result.Data != null && result.Data.Count == 0)
+                else if (result.Success && result.Data != null && result.Data.Flights?.Length == 0)
                 {
                     await Shell.Current.DisplayAlert("", "No flights found", "OK");
                 }
