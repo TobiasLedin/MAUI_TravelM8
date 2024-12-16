@@ -1,6 +1,4 @@
-﻿using MAUI_TravelM8.Models.Departures;
-
-namespace MAUI_TravelM8.Views;
+﻿namespace MAUI_TravelM8.Views;
 
 public partial class FlightSearch : ContentPage
 {

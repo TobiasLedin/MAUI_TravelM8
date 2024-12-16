@@ -16,10 +16,10 @@
                 SemanticProperties.HeadingLevel="Level1" />
 
             <Label
-                Text="Keep track of your next flights"
+                Text="Keep track of your next departures"
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Keep track of your next flights" />
+                SemanticProperties.Description="Keep track of your next departures" />
 
             <Entry
                 x:Name="entry"
@@ -40,7 +40,7 @@
                 SelectedItem="{Binding SelectedAirport}" />
 
             <DatePicker
-                Date="{Binding SelectedDate}"
+                Date="{Binding SelectedDate, Mode=TwoWay}"
                 MinimumDate="{Binding MinAllowedDate}"
                 HorizontalOptions="CenterAndExpand"
                 MinimumWidthRequest="160" />

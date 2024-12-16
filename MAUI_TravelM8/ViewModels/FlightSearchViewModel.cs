@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MAUI_TravelM8.Models;
-using MAUI_TravelM8.Models.Departures;
 using MAUI_TravelM8.Services;
-using MAUI_TravelM8.ViewModels;
 using MAUI_TravelM8.Views;
 using System.Collections.ObjectModel;
 
@@ -18,7 +16,7 @@ namespace MAUI_TravelM8
         public partial bool IsLoading { get; set; }
 
         [ObservableProperty]
-        public partial string FlightNumberInput { get; set; } = string.Empty;
+        public partial string? FlightNumberInput { get; set; }
 
         [ObservableProperty]
         public partial bool IsDatePickerVisible { get; set; }
@@ -99,13 +97,15 @@ namespace MAUI_TravelM8
 
             try
             {
-                var result = await _dataService.GetAirportDepartures(SelectedAirport, SelectedDate);
+                var result = await _dataService.GetAirportDepartures(SelectedAirport, SelectedDate, FlightNumberInput);
 
-                if (result.Success && result.Data != null && result.Data.Flights?.Length > 0)
+                if (result.Success && result.Data != null && result.Data.Flights?.Count > 0)
                 {
                     var navigationParam = new Dictionary<string, object>
                     {
-                        ["Flights"] = new ObservableCollection<Flight>(result.Data.Flights.OrderBy(x => x.DepartureTime?.ScheduledUtc)),
+                        ["Flights"] = new ObservableCollection<Flight>(result.Data.Flights
+                            .Where(x => x.DepartureTime.ActualUtc == null)
+                            .OrderBy(x => x.DepartureTime?.ScheduledUtc)) ?? new ObservableCollection<Flight>(),
                         ["DepartureAirport"] = SelectedAirport.DisplayName!,
                         ["DepartureDate"] = result.Data.From?.FlightDepartureDate!
                     };
@@ -113,7 +113,7 @@ namespace MAUI_TravelM8
                     await Shell.Current.GoToAsync(nameof(FlightList), navigationParam);
                        
                 }
-                else if (result.Success && result.Data != null && result.Data.Flights?.Length == 0)
+                else if (result.Success && result.Data != null && result.Data.Flights?.Count == 0)
                 {
                     await Shell.Current.DisplayAlert("", "No flights found", "OK");
                 }

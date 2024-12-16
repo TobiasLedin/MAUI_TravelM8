@@ -12,7 +12,11 @@
         ContentTemplate="{DataTemplate local:FlightSearch}" />
 
     <ShellContent
-        Title="Flights"
+        Title="Departures"
         ContentTemplate="{DataTemplate local:FlightList}" />
+
+    <ShellContent
+        Title="Tracked"
+        ContentTemplate="{DataTemplate local:TrackedFlights}" />
 
 </Shell>

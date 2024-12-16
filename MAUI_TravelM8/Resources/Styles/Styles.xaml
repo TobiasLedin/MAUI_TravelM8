@@ -19,6 +19,17 @@
         <Setter Property="StrokeThickness" Value="1"/>
     </Style>
 
+    <!--<Style TargetType="Border" x:Key="FlightData">
+        <Setter Property="Background" Value="AliceBlue"/>
+        <Style.Triggers>
+            <DataTrigger TargetType="Border" 
+                         Binding="{Binding DepartureTime.ActualUtc}" 
+                         Value="{x:Null}">
+                <Setter Property="Background" Value="DimGrey"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>-->
+
     <Style TargetType="BoxView">
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource Gray200}}" />
     </Style>

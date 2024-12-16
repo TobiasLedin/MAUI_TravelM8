@@ -1,6 +1,4 @@
 ﻿using MAUI_TravelM8.Models;
-using MAUI_TravelM8.Models.Departures;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -26,7 +24,7 @@ namespace MAUI_TravelM8.Services
             //TODO: Add Resilience policies
         }
 
- 
+
         public async Task<ActionResult<List<Airport>>> GetAirportData()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "airportinfo/v2/airports");
@@ -47,9 +45,16 @@ namespace MAUI_TravelM8.Services
             return ActionResult<List<Airport>>.FailureResult("Failed to retrieve airport data");
         }
 
-        public async Task<ActionResult<DepartureData>> GetAirportDepartures(Airport airport, DateTime date)
+        public async Task<ActionResult<FlightResponse>> GetAirportDepartures(Airport airport, DateTime date, string? flightNumber)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"flightinfo/v2/{airport.IATA}/departures/{date:yyyy-MM-dd}");
+            var requestUri = $"flightinfo/v2/{airport.IATA}/departures/{date:yyyy-MM-dd}";
+
+            if (!string.IsNullOrEmpty(flightNumber))
+            {
+                requestUri = $"flightinfo/v2/query?filter=airport eq '{airport.IATA}' and scheduled eq '{date:yyMMdd}' and flightType eq 'D' and flightId eq '{flightNumber}'";
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
             request.Headers.Host = "api.swedavia.se";
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.Add("Ocp-Apim-Subscription-Key", "fa800e41a2cc4306a5d7235258a7f06a"); // TODO: Store securely!
@@ -58,20 +63,51 @@ namespace MAUI_TravelM8.Services
 
             if (response.IsSuccessStatusCode)
             {
-                var departureData = await response.Content.ReadFromJsonAsync<DepartureData>();
+                var FlightResponse = await response.Content.ReadFromJsonAsync<FlightResponse>();
 
-                if (departureData != null)
+                if (FlightResponse != null)
                 {
-                    await StoreDepartureData(departureData);
+                    //await StoreDepartureData(FlightResponse);
 
-                    return ActionResult<DepartureData>.SuccessResult(departureData);
+                    return ActionResult<FlightResponse>.SuccessResult(FlightResponse);
                 }
             }
 
-            return ActionResult<DepartureData>.FailureResult("Failed to retrieve departure data");
+            return ActionResult<FlightResponse>.FailureResult("Failed to retrieve departure data");
         }
 
-        private async Task StoreDepartureData(DepartureData data)
+        public async Task<ActionResult<FlightResponse>> GetDepartureSpecificUpdate(Airport airport, DateTime date, string flightNumber, string continuationToken)
+        {
+
+            var requestUri = 
+                $"flightinfo/v2/query" +
+                $"?filter=airport eq '{airport.IATA}' and scheduled eq '{date:yy-MM-dd}' and flightType eq 'D' and flightId eq '{flightNumber}'" +
+                $"&continuationtoken={continuationToken}";
+
+
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            request.Headers.Host = "api.swedavia.se";
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            request.Headers.Add("Ocp-Apim-Subscription-Key", "fa800e41a2cc4306a5d7235258a7f06a"); // TODO: Store securely!
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var FlightResponse = await response.Content.ReadFromJsonAsync<FlightResponse>();
+
+                if (FlightResponse != null)
+                {
+                    //await StoreDepartureData(FlightResponse);
+
+                    return ActionResult<FlightResponse>.SuccessResult(FlightResponse);
+                }
+            }
+
+            return ActionResult<FlightResponse>.FailureResult("Failed to retrieve departure data");
+        }
+
+        private async Task StoreDepartureData(FlightResponse data)
         {
             try
             {
@@ -83,24 +119,24 @@ namespace MAUI_TravelM8.Services
             }
         }
 
-        public async Task<ActionResult<DepartureData>> ReadStoredDepartureData()
+        public async Task<ActionResult<FlightResponse>> ReadStoredDepartureData()
         {
             if (File.Exists(_fileName))
             {
                 try
                 {
                     var departureDataJson = await File.ReadAllTextAsync(_fileName);
-                    var departureData = JsonSerializer.Deserialize<DepartureData>(departureDataJson);
+                    var FlightResponse = JsonSerializer.Deserialize<FlightResponse>(departureDataJson);
 
-                    return ActionResult<DepartureData>.SuccessResult(departureData ?? throw new Exception());
+                    return ActionResult<FlightResponse>.SuccessResult(FlightResponse ?? throw new Exception());
                 }
                 catch (Exception ex)
                 {
-                    return ActionResult<DepartureData>.FailureResult($"Failed to read local file. Error: {ex}");
+                    return ActionResult<FlightResponse>.FailureResult($"Failed to read local file. Error: {ex}");
                 }
             }
 
-            return ActionResult<DepartureData>.FailureResult("Failed to read local file");
+            return ActionResult<FlightResponse>.FailureResult("Failed to read local file");
         }
     }
 }
