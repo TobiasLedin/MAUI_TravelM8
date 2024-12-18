@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using MAUI_TravelM8.Models;
 using MAUI_TravelM8.Services;
+using MAUI_TravelM8.Views;
 using System.Collections.ObjectModel;
 
 namespace MAUI_TravelM8.ViewModels
@@ -26,25 +27,35 @@ namespace MAUI_TravelM8.ViewModels
         public partial Flight? SelectedFlight { get; set; }
 
         [ObservableProperty]
-        public partial ObservableCollection<Flight> SelectedFlights { get; set; }
+        public partial bool HasFlights { get; set; }
+
+        [ObservableProperty]
+        public partial bool HasNoFlights { get; set; }
 
         public FlightListViewModel(ITravelDataService dataService)
         {
             _dataService = dataService;
+            Flights = [];
+            DepartureDate = string.Empty;
             DepartureAirport = string.Empty;
             SelectedFlight = null;
-            SelectedFlights = [];
         }
 
         partial void OnSelectedFlightChanged(Flight? value)
         {
             if (value != null)
             {
-                PromptAddToSelectedFlights(value);
+                PromptAddToTrackedFlights(value);
             }
         }
 
-        private async void PromptAddToSelectedFlights(Flight flight)
+        partial void OnFlightsChanged(ObservableCollection<Flight> value)
+        {
+            HasNoFlights = value.Count == 0;
+            HasFlights = value.Count > 0;
+        }
+
+        private async void PromptAddToTrackedFlights(Flight flight)
         {
             bool answer = await Shell.Current.DisplayAlert(
                 "Add Flight",
@@ -54,42 +65,44 @@ namespace MAUI_TravelM8.ViewModels
 
             if (answer)
             {
-                if (!SelectedFlights.Any(f => f.FlightId == flight.FlightId))
+                try
                 {
-                    SelectedFlights.Add(flight);
-                    //TODO: Redirect to Tracker page
-                }
-            }
+                    var response = await _dataService.GetAirportDepartures(flight.FlightLegIdentifier.DepartureAirportIata, flight.DepartureTime.SchDepTimeLocal, flight.FlightId);
 
-            SelectedFlight = null;
+                    if (response.Success)
+                    {
+                        var departureWithToken = response.Data!.Flights[0];
+                        departureWithToken.ContinuationToken = response.Data?.ContinuationToken;
+
+                        var navigationParam = new Dictionary<string, object>()
+                        {
+                            ["AddFlight"] = departureWithToken
+                        };
+
+                        await Shell.Current.GoToAsync(nameof(TrackedFlights), navigationParam);
+                    }
+                    else
+                    {
+                        await Shell.Current.DisplayAlert(
+                            "",
+                            "Flight is already tracked",
+                            "OK");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+                }
+                finally
+                {
+                    SelectedFlight = null;
+                }
+
+            }
         }
     }
 }
-        //public FlightListViewModel(ITravelDataService dataService)
-        //{
-        //    _dataService = dataService;
-        //    DepartureAirport = string.Empty;
-        //    //Flights = [];
-        //    SelectedFlight = null;
-        //    //_ = Task.Run(LoadStoredFlightData);
-        //}
 
-        //private async Task LoadStoredFlightData()
-        //{
-        //    if (Flights.Count == 0)
-        //    {
-        //        var result = await _dataService.ReadStoredDepartureData();
 
-        //        if (result.Success)
-        //        {
-        //            Flights = new ObservableCollection<Flight>(result.Data?.Flights!);
-        //            DepartureAirport = result.Data?.From?.DepartureAirportSwedish!;
-        //            DepartureDate = result.Data?.From?.FlightDepartureDate!;
-        //        }
 
-        //        //TODO: Error message handling
-        //    }
-        //}
-
-    
 

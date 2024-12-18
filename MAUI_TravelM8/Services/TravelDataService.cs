@@ -1,4 +1,5 @@
-﻿using MAUI_TravelM8.Models;
+﻿using MAUI_TravelM8.Helpers;
+using MAUI_TravelM8.Models;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -14,7 +15,11 @@ namespace MAUI_TravelM8.Services
         private HttpClient _httpClient;
         private readonly ILogger<TravelDataService> _logger;
         private readonly string _fileName = FileSystem.AppDataDirectory + "/FlightQueryData.json";
-
+        private readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new FlightListJsonConverter() }
+        };
 
         public TravelDataService(ILogger<TravelDataService> logger)
         {
@@ -45,13 +50,13 @@ namespace MAUI_TravelM8.Services
             return ActionResult<List<Airport>>.FailureResult("Failed to retrieve airport data");
         }
 
-        public async Task<ActionResult<FlightResponse>> GetAirportDepartures(Airport airport, DateTime date, string? flightNumber)
+        public async Task<ActionResult<FlightResponse>> GetAirportDepartures(string airportIata, DateTime date, string? flightNumber)
         {
-            var requestUri = $"flightinfo/v2/{airport.IATA}/departures/{date:yyyy-MM-dd}";
+            var requestUri = $"flightinfo/v2/{airportIata}/departures/{date:yyyy-MM-dd}";
 
             if (!string.IsNullOrEmpty(flightNumber))
             {
-                requestUri = $"flightinfo/v2/query?filter=airport eq '{airport.IATA}' and scheduled eq '{date:yyMMdd}' and flightType eq 'D' and flightId eq '{flightNumber}'";
+                requestUri = $"flightinfo/v2/query?filter=airport eq '{airportIata}' and scheduled eq '{date:yyMMdd}' and flightType eq 'D' and flightId eq '{flightNumber}'";
             }
 
             var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
@@ -63,25 +68,25 @@ namespace MAUI_TravelM8.Services
 
             if (response.IsSuccessStatusCode)
             {
-                var FlightResponse = await response.Content.ReadFromJsonAsync<FlightResponse>();
+                var flightResponse = await response.Content.ReadFromJsonAsync<FlightResponse>(_jsonOptions);
 
-                if (FlightResponse != null)
+                if (flightResponse != null)
                 {
                     //await StoreDepartureData(FlightResponse);
 
-                    return ActionResult<FlightResponse>.SuccessResult(FlightResponse);
+                    return ActionResult<FlightResponse>.SuccessResult(flightResponse);
                 }
             }
 
             return ActionResult<FlightResponse>.FailureResult("Failed to retrieve departure data");
         }
 
-        public async Task<ActionResult<FlightResponse>> GetDepartureSpecificUpdate(Airport airport, DateTime date, string flightNumber, string continuationToken)
+        public async Task<ActionResult<FlightResponse>> GetDepartureSpecificUpdate(string airportIata, DateTime date, string flightNumber, string continuationToken)
         {
 
             var requestUri = 
                 $"flightinfo/v2/query" +
-                $"?filter=airport eq '{airport.IATA}' and scheduled eq '{date:yy-MM-dd}' and flightType eq 'D' and flightId eq '{flightNumber}'" +
+                $"?filter=airport eq '{airportIata}' and scheduled eq '{date:yy-MM-dd}' and flightType eq 'D' and flightId eq '{flightNumber}'" +
                 $"&continuationtoken={continuationToken}";
 
 
@@ -94,49 +99,27 @@ namespace MAUI_TravelM8.Services
 
             if (response.IsSuccessStatusCode)
             {
-                var FlightResponse = await response.Content.ReadFromJsonAsync<FlightResponse>();
+                var flightResponse = await response.Content.ReadFromJsonAsync<FlightResponse>(_jsonOptions);
 
-                if (FlightResponse != null)
+                if (flightResponse != null)
                 {
                     //await StoreDepartureData(FlightResponse);
 
-                    return ActionResult<FlightResponse>.SuccessResult(FlightResponse);
+                    return ActionResult<FlightResponse>.SuccessResult(flightResponse);
                 }
             }
 
             return ActionResult<FlightResponse>.FailureResult("Failed to retrieve departure data");
         }
 
-        private async Task StoreDepartureData(FlightResponse data)
-        {
-            try
-            {
-                await File.WriteAllTextAsync(_fileName, JsonSerializer.Serialize(data));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Failed to write to local file! Error message: {ex}");
-            }
-        }
+        //private JsonSerializerOptions SerialiserOptions()
+        //{
+        //    return new JsonSerializerOptions
+        //    { 
+        //        PropertyNameCaseInsensitive = true, 
+        //        Converters = { new FlightListJsonConverter() }
+        //    };
+        //}
 
-        public async Task<ActionResult<FlightResponse>> ReadStoredDepartureData()
-        {
-            if (File.Exists(_fileName))
-            {
-                try
-                {
-                    var departureDataJson = await File.ReadAllTextAsync(_fileName);
-                    var FlightResponse = JsonSerializer.Deserialize<FlightResponse>(departureDataJson);
-
-                    return ActionResult<FlightResponse>.SuccessResult(FlightResponse ?? throw new Exception());
-                }
-                catch (Exception ex)
-                {
-                    return ActionResult<FlightResponse>.FailureResult($"Failed to read local file. Error: {ex}");
-                }
-            }
-
-            return ActionResult<FlightResponse>.FailureResult("Failed to read local file");
-        }
     }
 }

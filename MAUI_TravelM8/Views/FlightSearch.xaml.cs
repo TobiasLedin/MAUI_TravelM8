@@ -8,5 +8,4 @@ public partial class FlightSearch : ContentPage
         BindingContext = viewModel;
         AirportPicker.ItemDisplayBinding = new Binding("DisplayName");
     }
-
 }

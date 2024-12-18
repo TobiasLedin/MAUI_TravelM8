@@ -8,6 +8,8 @@ namespace MAUI_TravelM8
         {
             InitializeComponent();
 
+            Routing.RegisterRoute(nameof(FlightSearch), typeof(FlightSearch));
+
             Routing.RegisterRoute(nameof(FlightList), typeof(FlightList));
 
             Routing.RegisterRoute(nameof(TrackedFlights), typeof(TrackedFlights));

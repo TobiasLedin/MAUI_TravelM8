@@ -36,7 +36,6 @@ namespace MAUI_TravelM8
         [ObservableProperty]
         public partial string ErrorMessage { get; set; } = string.Empty;
 
-
         public IEnumerable<Airport> Airports { get; set; } = new List<Airport>()
         {
             new() { IATA = "ARN", Name = "STOCKHOLM ARLANDA", DisplayName ="Stockholm ARN" },
@@ -57,38 +56,7 @@ namespace MAUI_TravelM8
             SelectedDate = DateTime.UtcNow;
             MinAllowedDate = DateTime.UtcNow;
             SelectedAirport = Airports.First(x => x.IATA == "ARN");
-            //LoadAirportsAsync();
         }
-
-        //private async void LoadAirports()
-        //{
-        //    IsLoading = true;
-
-        //    try
-        //    {
-        //        var result = await _dataService.GetAirportData();
-
-        //        if (result.Success)
-        //        {
-        //            foreach (Airport airport in result.Data!)
-        //            {
-        //                Airports.Add(airport);
-        //            }
-        //            //Airports = result.Data!;
-        //            return;
-        //        }
-
-        //        ErrorMessage = result.Message;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ErrorMessage = ex.Message;
-        //    }
-        //    finally
-        //    {
-        //        IsLoading = false;
-        //    }
-        //}
 
         [RelayCommand]
         private async Task SearchFlights()
@@ -97,25 +65,37 @@ namespace MAUI_TravelM8
 
             try
             {
-                var result = await _dataService.GetAirportDepartures(SelectedAirport, SelectedDate, FlightNumberInput);
+                var result = await _dataService.GetAirportDepartures(SelectedAirport.IATA!, SelectedDate, FlightNumberInput);
 
                 if (result.Success && result.Data != null && result.Data.Flights?.Count > 0)
                 {
+                    var flights = result.Data.Flights
+                                    .Where(x =>
+                                        x.DepartureTime.SchDepTimeLocal.Date == SelectedDate.Date &&
+                                        x.LocationAndStatus.FlightLegStatus == "SCH")
+                                    .OrderBy(x => x.DepartureTime?.ScheduledUtc);
+
+                    if (!flights.Any())
+                    {
+                        await Shell.Current.DisplayAlert("", "No flights found", "OK");
+                        return;
+                    }
+
                     var navigationParam = new Dictionary<string, object>
                     {
-                        ["Flights"] = new ObservableCollection<Flight>(result.Data.Flights
-                            .Where(x => x.DepartureTime.ActualUtc == null)
-                            .OrderBy(x => x.DepartureTime?.ScheduledUtc)) ?? new ObservableCollection<Flight>(),
                         ["DepartureAirport"] = SelectedAirport.DisplayName!,
-                        ["DepartureDate"] = result.Data.From?.FlightDepartureDate!
+                        ["DepartureDate"] = result.Data.From?.FlightDepartureDate!,
+                        ["Flights"] = new ObservableCollection<Flight>(
+                            result.Data.Flights
+                                .Where(x =>
+                                    x.DepartureTime.SchDepTimeLocal.Date == SelectedDate.Date &&
+                                    x.LocationAndStatus.FlightLegStatus == "SCH")
+                                .OrderBy(x => x.DepartureTime?.ScheduledUtc)) ?? new ObservableCollection<Flight>(),
+                        
                     };
 
                     await Shell.Current.GoToAsync(nameof(FlightList), navigationParam);
                        
-                }
-                else if (result.Success && result.Data != null && result.Data.Flights?.Count == 0)
-                {
-                    await Shell.Current.DisplayAlert("", "No flights found", "OK");
                 }
             }
             catch (Exception ex)
@@ -127,25 +107,6 @@ namespace MAUI_TravelM8
                 IsLoading = false;
             }
         }
-
-        // Enable Search button
-        //partial void OnFlightNumberInputChanged(string value)
-        //{
-        //    if (FlightNumberInput.Length > 3)
-        //    {
-        //        IsSearchBtnEnabled = true;
-        //    }
-        //    else
-        //    {
-        //        IsSearchBtnEnabled = false;
-        //    }
-        //}
-
-        
-
-       
-        // Search => Reset SelectedDate
-        
 
     }
 }

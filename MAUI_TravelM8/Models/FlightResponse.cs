@@ -1,10 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using MAUI_TravelM8.Helpers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MAUI_TravelM8.Models
 {
     public class FlightResponse
     {
         [JsonPropertyName("flights")]
+        [JsonConverter(typeof(FlightListJsonConverter))]
         public List<Flight> Flights { get; set; }
 
         [JsonPropertyName("continuationtoken")]
@@ -57,6 +60,17 @@ namespace MAUI_TravelM8.Models
 
         [JsonPropertyName("diIndicator")]
         public string DiIndicator { get; set; }
+
+        public string? ContinuationToken { get; set; }
+
+        public static Flight FromNested(JsonElement element)
+        {
+            if (element.TryGetProperty("departure", out JsonElement departureElement))
+            {
+                return JsonSerializer.Deserialize<Flight>(departureElement.GetRawText());
+            }
+            return JsonSerializer.Deserialize<Flight>(element.GetRawText());
+        }
     }
 
     public class AirlineOperator

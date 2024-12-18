@@ -23,6 +23,7 @@
 		
 		<!--Added to enable CommunityToolkit.MVVM functionality-->
 		<LangVersion>preview</LangVersion>
+		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 
 		<!-- Display name -->
 		<ApplicationTitle>MAUI_TravelM8</ApplicationTitle>

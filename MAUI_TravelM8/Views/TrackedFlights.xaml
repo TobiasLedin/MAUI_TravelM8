@@ -1,12 +1,99 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:MAUI_TravelM8.ViewModels"
+             xmlns:models="clr-namespace:MAUI_TravelM8.Models"
              x:Class="MAUI_TravelM8.Views.TrackedFlights"
-             Title="Tracked Flights">
-    <VerticalStackLayout>
+             x:DataType="viewmodel:TrackedFlightsViewModel"
+             Title="Tracked">
+
+    <Grid>
+        <ScrollView IsVisible="{Binding HasFlights}">
+
+            <ListView
+                ItemsSource="{Binding Flights}"
+                VerticalScrollBarVisibility="Default"
+                RowHeight="160"
+                HorizontalOptions="CenterAndExpand">
+
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Flight">
+                        <ViewCell>
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem 
+                                            Text="Delete"
+                                            BackgroundColor="Red"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:TrackedFlightsViewModel}}, Path=DeleteFlightCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+
+                                <Border
+                                    Stroke="LightBlue"
+                                    StrokeThickness="2"
+                                    StrokeShape="RoundRectangle 10,10,10,10"
+                                    Padding="16,8"
+                                    HorizontalOptions="FillAndExpand">
+
+                                    <Grid
+                                        RowDefinitions="Auto,Auto,Auto"
+                                        ColumnDefinitions="*,*">
+
+                                        <Label Grid.Row="0" Grid.Column="0"
+                                            Text="{Binding FlightId}" 
+                                            FontAttributes="Bold"
+                                            FontSize="16"
+                                            HorizontalTextAlignment="Start"
+                                            Padding="0" />
+
+                                        <Label Grid.Row="0" Grid.Column="1"
+                                            Text="{Binding ArrivalAirportEnglish}" 
+                                            FontAttributes="Bold"
+                                            FontSize="16"
+                                            HorizontalTextAlignment="End"
+                                            Padding="0" />
+
+                                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                            Text="{Binding AirlineOperator.Name}" 
+                                            FontSize="14"
+                                            HorizontalTextAlignment="Start"
+                                            Padding="0,0,0,3" />
+
+                                        <StackLayout Grid.Row="2" Grid.Column="0" Padding="0,0,5,0">
+
+                                            <Label Text="Departure" FontAttributes="Bold" FontSize="12" />
+                                            <Label Text="{Binding DepartureTime.SchDepTimeLocal, StringFormat='Scheduled: {0:HH:mm}'}" FontSize="12" />
+                                            <Label Text="{Binding DepartureTime.EstDepTimeLocal, StringFormat='Estimated: {0:HH:mm}'}" IsVisible="{Binding DepartureTime.IsEstDepTimeLocalVisible}" FontSize="12" />
+                                            <Label Text="{Binding DepartureTime.ActDepTimeLocal, StringFormat='Actual: {0:HH:mm}'}" IsVisible="{Binding DepartureTime.IsActDepTimeLocalVisible}" FontSize="12" />
+
+                                        </StackLayout>
+
+                                        <StackLayout Grid.Row="2" Grid.Column="1" Padding="5,0,5,0">
+
+                                            <Label Text="Details" FontAttributes="Bold" FontSize="12" />
+                                            <Label Text="{Binding LocationAndStatus.FlightLegStatusEnglish}" FontSize="12" />
+
+                                        </StackLayout>
+
+                                    </Grid>
+                                </Border>
+
+                            </SwipeView>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </ScrollView>
+
         <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+            Text="No flights tracked"
+            IsVisible="{Binding HasNoFlights}"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            FontSize="16"
+            TextColor="Gray"/>
+
+    </Grid>
 </ContentPage>
