@@ -1,3 +1,4 @@
+using MAUI_TravelM8.Services;
 using MAUI_TravelM8.ViewModels;
 
 namespace MAUI_TravelM8.Views;
@@ -9,4 +10,5 @@ public partial class TrackedFlights : ContentPage
 		InitializeComponent();
 		BindingContext = viewModel;
     }
+
 }

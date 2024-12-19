@@ -22,9 +22,6 @@
                     <DataTemplate x:DataType="models:Flight">
                         <ViewCell>
                             <Border
-                                Stroke="LightBlue"
-                                StrokeThickness="2"
-                                StrokeShape="RoundRectangle 10,10,10,10"
                                 Padding="16,8"
                                 HorizontalOptions="FillAndExpand">
 

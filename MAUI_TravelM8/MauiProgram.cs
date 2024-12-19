@@ -31,12 +31,19 @@ namespace MAUI_TravelM8
                     fonts.AddFont("Roboto-ThinItalic.ttf", "RobotoThinItalic");
                 });
 
+            // Services
             builder.Services.AddSingleton<ITravelDataService, TravelDataService>();
             builder.Services.AddSingleton<LocalFlightStorage>();
+
+            // ViewModels
             builder.Services.AddSingleton<FlightSearchViewModel>();
             builder.Services.AddSingleton<TrackedFlightsViewModel>();
+            builder.Services.AddSingleton<FlightListViewModel>();
 
-            builder.Services.AddTransient<FlightListViewModel>();
+            // ContentPages
+            builder.Services.AddSingleton<FlightSearch>(); //TODO: Test
+            builder.Services.AddSingleton<FlightList>(); //TODO: Test
+            builder.Services.AddSingleton<TrackedFlights>(); //TODO: Test
 
 
 #if DEBUG

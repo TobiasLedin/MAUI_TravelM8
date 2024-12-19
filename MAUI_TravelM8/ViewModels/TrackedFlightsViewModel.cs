@@ -31,7 +31,6 @@ namespace MAUI_TravelM8.ViewModels
             LoadTrackedFlights();
         }
 
-
         partial void OnAddFlightChanged(Flight? value)
         {
             if (value != null)
@@ -60,13 +59,27 @@ namespace MAUI_TravelM8.ViewModels
             }
         }
 
+        //[RelayCommand]
+        //private async Task DeleteAllFlights()
+        //{
+        //    var answer = await Shell.Current.DisplayAlert("Error", "All tracked flights will be deleted", "Confirm", "Cancel");
+            
+        //    if (answer)
+        //    {
+        //        Flights.Clear();
+        //        DeleteAllTrackedFlights();
+        //    }
+        //}
+
         private async void LoadTrackedFlights()
         {
             var readResult = await _localstorage.ReadTrackedFlights();
 
             if (readResult.Success && readResult.Data != null)
             {
-                Flights = new ObservableCollection<Flight>(readResult.Data);
+                var flights = readResult.Data.OrderBy(x => x.DepartureTime!.SchDepTimeLocal);
+
+                Flights = new ObservableCollection<Flight>(flights);
                 return;
             }
 
@@ -74,8 +87,6 @@ namespace MAUI_TravelM8.ViewModels
             {
                 await Shell.Current.DisplayAlert("Error", "Failed to load saved flights from localstorage", "OK");
             }
-
-            OnPropertyChanged(nameof(Flights));
         }
 
         private async void AddTrackedFlight(Flight flight)
@@ -95,6 +106,16 @@ namespace MAUI_TravelM8.ViewModels
             if (!deleteResult.Success)
             {
                 await Shell.Current.DisplayAlert("Error", "Failed to delete flight from localstorage", "OK");
+            }
+        }
+
+        private async void DeleteAllTrackedFlights()
+        {
+            var deleteResult = await _localstorage.DeleteAllTrackedFlights();
+
+            if (!deleteResult.Success)
+            {
+                await Shell.Current.DisplayAlert("Error", "Failed to delete all flights from localstorage", "OK");
             }
         }
 

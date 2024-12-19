@@ -8,13 +8,13 @@ namespace MAUI_TravelM8.Models
     {
         [JsonPropertyName("flights")]
         [JsonConverter(typeof(FlightListJsonConverter))]
-        public List<Flight> Flights { get; set; }
+        public List<Flight>? Flights { get; set; }
 
         [JsonPropertyName("continuationtoken")]
-        public string ContinuationToken { get; set; }
+        public string? ContinuationToken { get; set; }
 
         [JsonPropertyName("from")]
-        public FromDetails From { get; set; }
+        public FromDetails? From { get; set; }
 
         [JsonPropertyName("numberOfFlights")]
         public int? NumberOfFlights { get; set; }
@@ -23,66 +23,68 @@ namespace MAUI_TravelM8.Models
     public class Flight
     {
         [JsonPropertyName("flightId")]
-        public string FlightId { get; set; }
+        public string? FlightId { get; set; }
 
         [JsonPropertyName("arrivalAirportSwedish")]
-        public string ArrivalAirportSwedish { get; set; }
+        public string? ArrivalAirportSwedish { get; set; }
 
         [JsonPropertyName("arrivalAirportEnglish")]
-        public string ArrivalAirportEnglish { get; set; }
+        public string? ArrivalAirportEnglish { get; set; }
 
         [JsonPropertyName("airlineOperator")]
-        public AirlineOperator AirlineOperator { get; set; }
+        public AirlineOperator? AirlineOperator { get; set; }
 
         [JsonPropertyName("departureTime")]
-        public DepartureTime DepartureTime { get; set; }
+        public DepartureTime? DepartureTime { get; set; }
 
         [JsonPropertyName("locationAndStatus")]
-        public LocationAndStatus LocationAndStatus { get; set; }
+        public LocationAndStatus? LocationAndStatus { get; set; }
 
         [JsonPropertyName("checkIn")]
-        public CheckIn CheckIn { get; set; }
+        public CheckIn? CheckIn { get; set; }
 
         [JsonPropertyName("codeShareData")]
-        public List<string> CodeShareData { get; set; }
+        public List<string>? CodeShareData { get; set; }
 
         [JsonPropertyName("flightLegIdentifier")]
-        public FlightLegIdentifier FlightLegIdentifier { get; set; }
+        public FlightLegIdentifier? FlightLegIdentifier { get; set; }
 
         [JsonPropertyName("viaDestinations")]
-        public List<ViaDestination> ViaDestinations { get; set; }
+        public List<ViaDestination>? ViaDestinations { get; set; }
 
         [JsonPropertyName("remarksEnglish")]
-        public List<Remark> RemarksEnglish { get; set; }
+        public List<Remark>? RemarksEnglish { get; set; }
 
         [JsonPropertyName("remarksSwedish")]
-        public List<Remark> RemarksSwedish { get; set; }
+        public List<Remark>? RemarksSwedish { get; set; }
 
         [JsonPropertyName("diIndicator")]
-        public string DiIndicator { get; set; }
+        public string? DiIndicator { get; set; }
 
         public string? ContinuationToken { get; set; }
+
+        public string? DepartureAirport { get; set; }
 
         public static Flight FromNested(JsonElement element)
         {
             if (element.TryGetProperty("departure", out JsonElement departureElement))
             {
-                return JsonSerializer.Deserialize<Flight>(departureElement.GetRawText());
+                return JsonSerializer.Deserialize<Flight>(departureElement.GetRawText()) ?? throw new Exception("JsonSerializer error");
             }
-            return JsonSerializer.Deserialize<Flight>(element.GetRawText());
+            return JsonSerializer.Deserialize<Flight>(element.GetRawText()) ?? throw new Exception("JsonSerializer error");
         }
     }
 
     public class AirlineOperator
     {
         [JsonPropertyName("iata")]
-        public string Iata { get; set; }
+        public string? Iata { get; set; }
 
         [JsonPropertyName("icao")]
-        public string Icao { get; set; }
+        public string? Icao { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 
     public class DepartureTime
@@ -107,19 +109,19 @@ namespace MAUI_TravelM8.Models
     public class LocationAndStatus
     {
         [JsonPropertyName("terminal")]
-        public string Terminal { get; set; }
+        public string? Terminal { get; set; }
 
         [JsonPropertyName("gate")]
-        public string Gate { get; set; }
+        public string? Gate { get; set; }
 
         [JsonPropertyName("gateAction")]
-        public string GateAction { get; set; }
+        public string? GateAction { get; set; }
 
         [JsonPropertyName("gateActionSwedish")]
-        public string GateActionSwedish { get; set; }
+        public string? GateActionSwedish { get; set; }
 
         [JsonPropertyName("gateActionEnglish")]
-        public string GateActionEnglish { get; set; }
+        public string? GateActionEnglish { get; set; }
 
         [JsonPropertyName("gateOpenUtc")]
         public DateTime? GateOpenUtc { get; set; }
@@ -128,25 +130,25 @@ namespace MAUI_TravelM8.Models
         public DateTime? GateCloseUtc { get; set; }
 
         [JsonPropertyName("flightLegStatus")]
-        public string FlightLegStatus { get; set; }
+        public string? FlightLegStatus { get; set; }
 
         [JsonPropertyName("flightLegStatusSwedish")]
-        public string FlightLegStatusSwedish { get; set; }
+        public string? FlightLegStatusSwedish { get; set; }
 
         [JsonPropertyName("flightLegStatusEnglish")]
-        public string FlightLegStatusEnglish { get; set; }
+        public string? FlightLegStatusEnglish { get; set; }
     }
 
     public class CheckIn
     {
         [JsonPropertyName("checkInStatus")]
-        public string CheckInStatus { get; set; }
+        public string? CheckInStatus { get; set; }
 
         [JsonPropertyName("checkInStatusSwedish")]
-        public string CheckInStatusSwedish { get; set; }
+        public string? CheckInStatusSwedish { get; set; }
 
         [JsonPropertyName("checkInStatusEnglish")]
-        public string CheckInStatusEnglish { get; set; }
+        public string? CheckInStatusEnglish { get; set; }
 
         [JsonPropertyName("checkInDeskFrom")]
         public int? CheckInDeskFrom { get; set; }
@@ -158,73 +160,73 @@ namespace MAUI_TravelM8.Models
     public class FlightLegIdentifier
     {
         [JsonPropertyName("ifplId")]
-        public string IfplId { get; set; }
+        public string? IfplId { get; set; }
 
         [JsonPropertyName("callsign")]
-        public string Callsign { get; set; }
+        public string? Callsign { get; set; }
 
         [JsonPropertyName("aircraftRegistration")]
-        public string AircraftRegistration { get; set; }
+        public string? AircraftRegistration { get; set; }
 
         [JsonPropertyName("ssrCode")]
-        public string SsrCode { get; set; }
+        public string? SsrCode { get; set; }
 
         [JsonPropertyName("flightId")]
-        public string FlightId { get; set; }
+        public string? FlightId { get; set; }
 
         [JsonPropertyName("flightDepartureDateUtc")]
         public DateTime? FlightDepartureDateUtc { get; set; }
 
         [JsonPropertyName("departureAirportIata")]
-        public string DepartureAirportIata { get; set; }
+        public string? DepartureAirportIata { get; set; }
 
         [JsonPropertyName("arrivalAirportIata")]
-        public string ArrivalAirportIata { get; set; }
+        public string? ArrivalAirportIata { get; set; }
 
         [JsonPropertyName("departureAirportIcao")]
-        public string DepartureAirportIcao { get; set; }
+        public string? DepartureAirportIcao { get; set; }
 
         [JsonPropertyName("arrivalAirportIcao")]
-        public string ArrivalAirportIcao { get; set; }
+        public string? ArrivalAirportIcao { get; set; }
     }
 
     public class ViaDestination
     {
         [JsonPropertyName("airportIATA")]
-        public string AirportIATA { get; set; }
+        public string? AirportIATA { get; set; }
 
         [JsonPropertyName("airportSwedish")]
-        public string AirportSwedish { get; set; }
+        public string? AirportSwedish { get; set; }
 
         [JsonPropertyName("airportEnglish")]
-        public string AirportEnglish { get; set; }
+        public string? AirportEnglish { get; set; }
     }
 
     public class Remark
     {
         [JsonPropertyName("text")]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         [JsonPropertyName("indicator")]
-        public string Indicator { get; set; }
+        public string? Indicator { get; set; }
     }
 
     public class FromDetails
     {
         [JsonPropertyName("departureAirportIata")]
-        public string DepartureAirportIata { get; set; }
+        public string? DepartureAirportIata { get; set; }
 
         [JsonPropertyName("departureAirportIcao")]
-        public string DepartureAirportIcao { get; set; }
+        public string? DepartureAirportIcao { get; set; }
 
         [JsonPropertyName("departureAirportSwedish")]
-        public string DepartureAirportSwedish { get; set; }
+        public string? DepartureAirportSwedish { get; set; }
 
         [JsonPropertyName("departureAirportEnglish")]
-        public string DepartureAirportEnglish { get; set; }
+        public string? DepartureAirportEnglish { get; set; }
 
         [JsonPropertyName("flightDepartureDate")]
-        public string FlightDepartureDate { get; set; }
+        public string? FlightDepartureDate { get; set; }
     }
 
 }

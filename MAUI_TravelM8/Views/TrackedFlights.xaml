@@ -1,99 +1,146 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewmodel="clr-namespace:MAUI_TravelM8.ViewModels"
+             xmlns:viewmodels="clr-namespace:MAUI_TravelM8.ViewModels"
              xmlns:models="clr-namespace:MAUI_TravelM8.Models"
              x:Class="MAUI_TravelM8.Views.TrackedFlights"
-             x:DataType="viewmodel:TrackedFlightsViewModel"
+             x:DataType="viewmodels:TrackedFlightsViewModel"
              Title="Tracked">
 
     <Grid>
-        <ScrollView IsVisible="{Binding HasFlights}">
 
-            <ListView
-                ItemsSource="{Binding Flights}"
-                VerticalScrollBarVisibility="Default"
-                RowHeight="160"
-                HorizontalOptions="CenterAndExpand">
+        <!--<Button x:Name="DeleteAllTracked"
+            Text="Delete All"
+            HorizontalOptions="Center"
+            VerticalOptions="End"
+            IsVisible="{Binding HasFlights}"
+            Command="{Binding DeleteAllFlightsCommand}"/>-->
 
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="models:Flight">
-                        <ViewCell>
-                            <SwipeView>
-                                <SwipeView.RightItems>
-                                    <SwipeItems>
-                                        <SwipeItem 
-                                            Text="Delete"
-                                            BackgroundColor="Red"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:TrackedFlightsViewModel}}, Path=DeleteFlightCommand}"
-                                            CommandParameter="{Binding .}"/>
-                                    </SwipeItems>
-                                </SwipeView.RightItems>
+        <CollectionView x:Name="CollectionView"
+            ItemsSource="{Binding Flights}"
+            SelectionMode="None">
 
-                                <Border
-                                    Stroke="LightBlue"
-                                    StrokeThickness="2"
-                                    StrokeShape="RoundRectangle 10,10,10,10"
-                                    Padding="16,8"
-                                    HorizontalOptions="FillAndExpand">
+            <CollectionView.EmptyView>
+                <Label 
+                    Text="No flights tracked"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    FontSize="16"
+                    TextColor="Gray"/>
+            </CollectionView.EmptyView>
+            
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Flight">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems x:DataType="models:Flight">
+                                <SwipeItem 
+                                    Text="Delete"
+                                    BackgroundColor="OrangeRed"
+                                    Command="{Binding Source={x:RelativeSource Mode=FindAncestorBindingContext, AncestorType={x:Type viewmodels:TrackedFlightsViewModel}}, Path=DeleteFlightCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </SwipeItems>
+                        </SwipeView.RightItems>
 
-                                    <Grid
-                                        RowDefinitions="Auto,Auto,Auto"
-                                        ColumnDefinitions="*,*">
+                        <Border
+                            Padding="16,8"
+                            HorizontalOptions="FillAndExpand">
 
-                                        <Label Grid.Row="0" Grid.Column="0"
-                                            Text="{Binding FlightId}" 
-                                            FontAttributes="Bold"
-                                            FontSize="16"
-                                            HorizontalTextAlignment="Start"
-                                            Padding="0" />
+                            <Grid
+                                RowDefinitions="Auto,Auto,Auto,Auto"
+                                ColumnDefinitions="*,*,*,*">
 
-                                        <Label Grid.Row="0" Grid.Column="1"
-                                            Text="{Binding ArrivalAirportEnglish}" 
-                                            FontAttributes="Bold"
-                                            FontSize="16"
-                                            HorizontalTextAlignment="End"
-                                            Padding="0" />
+                                <Label Grid.Row="0" Grid.Column="0"
+                                    Text="{Binding DepartureTime.SchDepTimeLocal.Date, StringFormat='{}{0:yyyy-MM-dd}'}" 
+                                    FontAttributes="None"
+                                    FontSize="16"
+                                    HorizontalTextAlignment="Start"
+                                    Padding="0" />
+                                
+                                <Label Grid.Row="1" Grid.Column="0"
+                                    Text="{Binding FlightId}" 
+                                    FontAttributes="Bold"
+                                    FontSize="18"
+                                    HorizontalTextAlignment="Start"
+                                    Padding="0" />
 
-                                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                                            Text="{Binding AirlineOperator.Name}" 
-                                            FontSize="14"
-                                            HorizontalTextAlignment="Start"
-                                            Padding="0,0,0,3" />
+                                <Label Grid.Row="0" Grid.Column="2"
+                                    Text="Departing" 
+                                    FontSize="14"
+                                    HorizontalTextAlignment="Start"
+                                    Padding="0" />
 
-                                        <StackLayout Grid.Row="2" Grid.Column="0" Padding="0,0,5,0">
+                                <Label Grid.Row="0" Grid.Column="3"
+                                    Text="Arriving" 
+                                    FontSize="14"
+                                    HorizontalTextAlignment="Start"
+                                    Padding="0" />
 
-                                            <Label Text="Departure" FontAttributes="Bold" FontSize="12" />
-                                            <Label Text="{Binding DepartureTime.SchDepTimeLocal, StringFormat='Scheduled: {0:HH:mm}'}" FontSize="12" />
-                                            <Label Text="{Binding DepartureTime.EstDepTimeLocal, StringFormat='Estimated: {0:HH:mm}'}" IsVisible="{Binding DepartureTime.IsEstDepTimeLocalVisible}" FontSize="12" />
-                                            <Label Text="{Binding DepartureTime.ActDepTimeLocal, StringFormat='Actual: {0:HH:mm}'}" IsVisible="{Binding DepartureTime.IsActDepTimeLocalVisible}" FontSize="12" />
+                                <Label Grid.Row="1" Grid.Column="2"
+                                    Text="{Binding DepartureAirport}" 
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    HorizontalTextAlignment="Justify"
+                                    Padding="0,0,4,0" />
+                                
+                                <Label Grid.Row="1" Grid.Column="3"
+                                    Text="{Binding ArrivalAirportEnglish}" 
+                                    FontAttributes="Bold"
+                                    FontSize="16"
+                                    HorizontalTextAlignment="Start"
+                                    Padding="0" />
 
-                                        </StackLayout>
+                                <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                    Text="{Binding AirlineOperator.Name}" 
+                                    FontSize="14"
+                                    HorizontalTextAlignment="Start"
+                                    Padding="0,0,0,4" />
 
-                                        <StackLayout Grid.Row="2" Grid.Column="1" Padding="5,0,5,0">
+                                <StackLayout Grid.Row="3" Grid.Column="0" Padding="0,0,5,0">
 
-                                            <Label Text="Details" FontAttributes="Bold" FontSize="12" />
-                                            <Label Text="{Binding LocationAndStatus.FlightLegStatusEnglish}" FontSize="12" />
+                                    <Label Text="Departure" FontAttributes="Bold" FontSize="12" />
+                                    <Label Text="{Binding DepartureTime.SchDepTimeLocal, StringFormat='Scheduled: {0:HH:mm}'}" FontSize="12" />
+                                    <Label Text="{Binding DepartureTime.EstDepTimeLocal, StringFormat='Estimated: {0:HH:mm}'}" IsVisible="{Binding DepartureTime.IsEstDepTimeLocalVisible}" FontSize="12" />
+                                    <Label Text="{Binding DepartureTime.ActDepTimeLocal, StringFormat='Actual: {0:HH:mm}'}" IsVisible="{Binding DepartureTime.IsActDepTimeLocalVisible}" FontSize="12" />
 
-                                        </StackLayout>
+                                </StackLayout>
 
-                                    </Grid>
-                                </Border>
+                                <StackLayout Grid.Row="3" Grid.Column="1" Padding="5,0,5,0">
 
-                            </SwipeView>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </ScrollView>
+                                    <Label Text="Status" FontAttributes="Bold" FontSize="12" />
+                                    <Label Text="{Binding LocationAndStatus.FlightLegStatusEnglish}" FontSize="12" />
 
-        <Label 
+                                </StackLayout>
+
+                                <StackLayout Grid.Row="3" Grid.Column="2" Padding="5,0,5,0">
+
+                                    <Label Text="Terminal" FontAttributes="Bold" FontSize="12" />
+                                    <Label Text="{Binding LocationAndStatus.Terminal}" FontSize="12" />
+
+                                </StackLayout>
+
+                                <StackLayout Grid.Row="3" Grid.Column="3" Padding="5,0,5,0">
+
+                                    <Label Text="Gate" FontAttributes="Bold" FontSize="12" />
+                                    <Label Text="{Binding LocationAndStatus.Gate}" FontSize="12" />
+
+                                </StackLayout>
+
+                            </Grid>
+                        </Border>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+        <!--<Label 
             Text="No flights tracked"
             IsVisible="{Binding HasNoFlights}"
             HorizontalOptions="Center"
             VerticalOptions="Center"
             FontSize="16"
-            TextColor="Gray"/>
+            TextColor="Gray"/>-->
 
     </Grid>
 </ContentPage>

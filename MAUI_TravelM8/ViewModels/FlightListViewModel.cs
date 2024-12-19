@@ -67,12 +67,13 @@ namespace MAUI_TravelM8.ViewModels
             {
                 try
                 {
-                    var response = await _dataService.GetAirportDepartures(flight.FlightLegIdentifier.DepartureAirportIata, flight.DepartureTime.SchDepTimeLocal, flight.FlightId);
+                    var response = await _dataService.GetAirportDepartures(flight.FlightLegIdentifier!.DepartureAirportIata!, flight.DepartureTime!.SchDepTimeLocal, flight.FlightId);
 
                     if (response.Success)
                     {
-                        var departureWithToken = response.Data!.Flights[0];
+                        var departureWithToken = response.Data!.Flights![0];
                         departureWithToken.ContinuationToken = response.Data?.ContinuationToken;
+                        departureWithToken.DepartureAirport = DepartureAirport;
 
                         var navigationParam = new Dictionary<string, object>()
                         {

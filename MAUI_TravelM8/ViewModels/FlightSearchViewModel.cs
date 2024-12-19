@@ -71,8 +71,8 @@ namespace MAUI_TravelM8
                 {
                     var flights = result.Data.Flights
                                     .Where(x =>
-                                        x.DepartureTime.SchDepTimeLocal.Date == SelectedDate.Date &&
-                                        x.LocationAndStatus.FlightLegStatus == "SCH")
+                                        x.DepartureTime!.SchDepTimeLocal.Date == SelectedDate.Date &&
+                                        x.LocationAndStatus!.FlightLegStatus == "SCH")
                                     .OrderBy(x => x.DepartureTime?.ScheduledUtc);
 
                     if (!flights.Any())
@@ -88,8 +88,8 @@ namespace MAUI_TravelM8
                         ["Flights"] = new ObservableCollection<Flight>(
                             result.Data.Flights
                                 .Where(x =>
-                                    x.DepartureTime.SchDepTimeLocal.Date == SelectedDate.Date &&
-                                    x.LocationAndStatus.FlightLegStatus == "SCH")
+                                    x.DepartureTime!.SchDepTimeLocal.Date == SelectedDate.Date &&
+                                    x.LocationAndStatus!.FlightLegStatus == "SCH")
                                 .OrderBy(x => x.DepartureTime?.ScheduledUtc)) ?? new ObservableCollection<Flight>(),
                         
                     };

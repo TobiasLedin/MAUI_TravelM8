@@ -12,14 +12,11 @@
 
             <Label
                 Text="TravelM8"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
+                Style="{StaticResource Headline}" />
 
             <Label
-                Text="Keep track of your next departures"
-                Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Keep track of your next departures" />
+                Text="Keep track of your departures"
+                Style="{StaticResource SubHeadline}" />
 
             <Entry
                 x:Name="entry"

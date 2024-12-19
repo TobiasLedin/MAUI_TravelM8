@@ -81,5 +81,20 @@ namespace MAUI_TravelM8.Services
             }
         }
 
+        public async Task<ActionResult<List<Flight>>> DeleteAllTrackedFlights()
+        {
+            try
+            {
+                await File.WriteAllTextAsync(_filePath, "[]");
+
+                return ActionResult<List<Flight>>.SuccessResult([]);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error writing to file '{_filePath}': {ex.Message}");
+                return ActionResult<List<Flight>>.FailureResult("Failed to save flight data.");
+            }
+        }
+
     }
 }
